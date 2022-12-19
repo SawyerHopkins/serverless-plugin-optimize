@@ -457,13 +457,17 @@ class Optimize {
           }
 
           /** Copy file */
-          const externalEntry = resolveFrom(functionFile, external) || functionDir + '/'
-          const externalDir = externalEntry.substring(
-            this.serverless.config.servicePath.length,
-            externalEntry.lastIndexOf('node_modules/' + external)
-          ) + 'node_modules/' + external
+          let sourcePath = functionOptions.externalPaths[external]
+          if (!sourcePath) {
+            // Resolve external path if one is not provided
+            const externalEntry = resolveFrom(functionFile, external) || functionDir + '/'
+            sourcePath = externalEntry.substring(
+              this.serverless.config.servicePath.length,
+              externalEntry.lastIndexOf('node_modules/' + external)
+            ) + 'node_modules/' + external
+          }
           return fs.copyAsync(
-            this.getPath(functionOptions.externalPaths[external] || externalDir),
+            this.getPath(sourcePath),
             this.getPath(functionModulesOptimizeDir + '/' + external)
           )
         })
